@@ -49,15 +49,20 @@ def process_telco():
     X[:,25] = imp.fit_transform(X[:,25].reshape(-1,1))[:,0]
 
 
-    X_train, X_test, y_train, y_test=train_test_split(X, y, test_size=0.2, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
     #Feature Scaling
     sc_X = StandardScaler()
     X_train = sc_X.fit_transform(X_train)
     X_test = sc_X.transform(X_test)
 
-    return X_train[:,:10], X_test[:,:10], y_train, y_test
-    # return X_train, X_test, y_train, y_test
+    X_train = X_train[:,:10]
+    X_test = X_test[:,:10]
+
+    X_train = np.c_[X_train, np.ones(X_train.shape[0])]
+    X_test  = np.c_[X_test,  np.ones(X_test.shape[0])]
+
+    return X_train, X_test, y_train, y_test
 
 
 

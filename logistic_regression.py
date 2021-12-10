@@ -15,42 +15,40 @@ class LogisticRegression():
         return float((m.exp(x) - m.exp(-x)) / (m.exp(x) + m.exp(-x)))
 
     def predict(self, example, w):
-        yhat = w[0]
-        for i in range(len(example)-1):
-            yhat += w[i+1] * example[i]
-        return m.tanh(yhat)
+        yhat = np.dot(example, w.reshape(-1,1))
+        return np.tanh(yhat).flatten()
 
-    def sgd(self, train, obs):
-        w = [0.0 for i in range(len(train[0])+1)]
+    def sgd(self, x, y):
+        w = np.array([0.0 for i in range(x.shape[1])]) #.reshape(-1,1)
         for itr in range(self.epoch):
-            for i, row in enumerate(train):
-                yhat = self.predict(row, w)
-                err = obs[i] - yhat
-                w[0] = w[0] + self.alpha * err * (1.0 - yhat*yhat)
-                for i in range(len(row)):
-                    w[i+1] = w[i+1] + self.alpha * err * (1.0 - yhat*yhat) * row[i]
-        return w
+            yhat = self.predict(x, w)
+            err = y - yhat
+            dloss = self.alpha * (err * (1.0 - yhat*yhat) * x.T).mean(axis=1)
+            w = w + dloss
+            # w = w + self.alpha * (err * (1.0 - yhat*yhat) * x.T).mean(axis=1)
+            # print(err.shape, y.shape, yhat.shape, w.shape, dloss.shape)
+        return w.flatten()
 
 
 
 
 def main():
     X_train, X_test, y_train, y_test = preproc.process_telco()
+    n_obs = X_train.shape[0]
     lr = LogisticRegression(0.3, 100)
     w = lr.sgd(X_train, y_train)
     print(w)
 
+    yhat = lr.predict(X_train, w)
+    print(yhat.shape)
+
     score = 0
-    for i, row in enumerate(X_train):
-        yhat = lr.predict(row, w)
-        pred = 1 if yhat > 0 else -1
-        # pred = round(yhat)
+    for i in range(n_obs):
+        pred = 1 if yhat[i] > 0 else -1
         obs = 1 if y_train[i] == 1 else -1
         if pred == obs:
             score += 1
-
-    print("Score:", score/X_train.shape[0])
-
+    print("Score:", score/n_obs)
 
 if __name__ == '__main__':
     main()
