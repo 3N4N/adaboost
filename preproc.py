@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 def process_telco():
     df = pd.read_csv('data/WA_Fn-UseC_-Telco-Customer-Churn.csv')
@@ -51,13 +51,13 @@ def process_telco():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-    #Feature Scaling
     sc_X = StandardScaler()
+    # sc_X = MinMaxScaler()
     X_train = sc_X.fit_transform(X_train)
     X_test = sc_X.transform(X_test)
 
-    X_train = X_train[:,:10]
-    X_test = X_test[:,:10]
+    # X_train = X_train[:,:10]
+    # X_test = X_test[:,:10]
 
     X_train = np.c_[X_train, np.ones(X_train.shape[0])]
     X_test  = np.c_[X_test,  np.ones(X_test.shape[0])]
