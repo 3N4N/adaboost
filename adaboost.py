@@ -55,7 +55,7 @@ class Adaboost():
         yhat = []
         for k in range(self.n_clf):
             yhat.append(self.z[k] * np.round(self.clfs[k].predict(X)))
-        yhat = np.sum(np.array(yhat), axis=0)
+        yhat = np.round(np.sum(np.array(yhat), axis=0))
 
         score = 0
         for i in range(X.shape[0]):
