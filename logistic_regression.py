@@ -12,11 +12,14 @@ class LogisticRegression():
         self.epoch = epoch
         self.X = X
         self.y = y
+        self.w = []
 
     def tanh(self, x):
         return float((m.exp(x) - m.exp(-x)) / (m.exp(x) + m.exp(-x)))
 
-    def predict(self, examples, w):
+    def predict(self, examples, w=None):
+        if w is None:
+            w = self.w
         yhat = np.dot(examples, w.reshape(-1,1))
         ret = np.tanh(yhat).flatten()
         ret = (ret + 1) / 2
@@ -43,7 +46,7 @@ def main():
     lr.sgd()
     print(lr.w)
 
-    yhat = lr.predict(X_train, lr.w)
+    yhat = lr.predict(X_train)
 
     score = 0
     for i in range(n_samples):
