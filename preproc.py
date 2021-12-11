@@ -1,15 +1,16 @@
-# Importing the libraries
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.feature_selection import mutual_info_classif
+from sklearn.feature_selection import SelectKBest,SelectPercentile
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
-def process_telco():
+def process_telco(percentile=None):
     df = pd.read_csv('data/WA_Fn-UseC_-Telco-Customer-Churn.csv')
     df = df.drop(columns=['customerID'])
 
@@ -48,7 +49,12 @@ def process_telco():
     imp = SimpleImputer(missing_values=np.NAN, strategy= 'mean')
     X[:,25] = imp.fit_transform(X[:,25].reshape(-1,1))[:,0]
 
+    if percentile != None or percentile != 0:
+        # X = SelectKBest(mutual_info_classif, k=percentile).fit_transform(X, y)
+        X = SelectPercentile(mutual_info_classif, percentile=percentile).fit_transform(X, y)
 
+    # print(np.sum(y == 1))
+    # print(np.sum(y == 0))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
     sc_X = StandardScaler()
@@ -64,9 +70,80 @@ def process_telco():
 
     return X_train, X_test, y_train, y_test
 
+def process_adult(percentile=None):
 
+    columns = [
+            'age', 'workclass', 'fnlwgt', 'education',
+            'education-num', 'marital-status', 'occupation',
+            'relationship', 'race', 'sex', 'capital-gain',
+            'capital-loss', 'hours-per-week', 'native-country', 'morethan50k'
+    ]
+    numeric_cols = [
+            'age', 'fnlwgt', 'education-num', 'capital-gain',
+            'capital-loss', 'hours-per-week'
+    ]
+    yes_no_colms = ['sex', 'morethan50k']
+    yes_no_map = [{'Male': 1, 'Female': 0}, {'>50K': 1, '<=50K': 0}]
+    cat_colms = [cat for cat in columns[:-1] if cat not in numeric_cols]
+    cat_colms = [cat for cat in cat_colms if cat not in yes_no_colms]
+
+    df = pd.read_csv('data/adult/adult.data', header=None, names=columns)
+    df_test = pd.read_csv('data/adult/adult.test', header=None, names=columns).drop(0)
+    n_samples_train = df.shape[0]
+    n_samples_test = df_test.shape[0]
+    df = df.append(df_test)
+    df.columns = columns
+
+    for c in df.columns:
+        df[c] = df[c].astype(str).str.strip()
+
+    df = df.replace('?', np.NAN)
+
+    imp = SimpleImputer(missing_values=np.NAN, strategy='most_frequent')
+    df = pd.DataFrame(imp.fit_transform(df), columns=df.columns, index=df.index)
+
+    for c in cat_colms:
+        df = pd.concat([df, pd.get_dummies(df[c], prefix=c)], axis=1)
+    df.drop(columns=cat_colms, axis=1, inplace=True)
+
+    for i in range(len(yes_no_colms)):
+        df[yes_no_colms[i]].replace(yes_no_map[i], inplace=True)
+
+    for c in numeric_cols:
+        df[c] = pd.to_numeric(df[c])
+
+    # df.to_csv("adult.csv")
+
+    X = df.iloc[:, :-1].values
+    y = df.iloc[:, -1].values
+
+    if percentile != None or percentile != 0:
+        # X = SelectKBest(mutual_info_classif, k=percentile).fit_transform(X, y)
+        X = SelectPercentile(mutual_info_classif, percentile=percentile).fit_transform(X, y)
+
+    X_train = X[0:n_samples_train,:]
+    y_train = y[0:n_samples_train]
+    X_test = X[n_samples_train:,:]
+    y_test = y[n_samples_train:]
+
+    sc_X = StandardScaler()
+    # sc_X = MinMaxScaler()
+    X_train = sc_X.fit_transform(X_train)
+    X_test = sc_X.transform(X_test)
+
+    # print(np.sum(y_train == 0))
+    # print(np.sum(y_train == 1))
+    # print(np.sum(y_test == 0))
+    # print(np.sum(y_test == 1))
+
+    X_train = np.c_[X_train, np.ones(X_train.shape[0])]
+    X_test  = np.c_[X_test,  np.ones(X_test.shape[0])]
+
+    return X_train, X_test, y_train, y_test
 
 if __name__ == '__main__':
     print("Running preprocessing . . .")
     X_train, X_test, y_train, y_test = process_telco()
+    print()
+    X_train, X_test, y_train, y_test = process_adult()
     print("Finished preprocessing.")
