@@ -49,8 +49,7 @@ def process_telco(percentile=None):
     imp = SimpleImputer(missing_values=np.NAN, strategy= 'mean')
     X[:,25] = imp.fit_transform(X[:,25].reshape(-1,1))[:,0]
 
-    if percentile != None or percentile != 0:
-        # X = SelectKBest(mutual_info_classif, k=percentile).fit_transform(X, y)
+    if percentile is not None and percentile != 0:
         X = SelectPercentile(mutual_info_classif, percentile=percentile).fit_transform(X, y)
 
     # print(np.sum(y == 1))
@@ -117,8 +116,7 @@ def process_adult(percentile=None):
     X = df.iloc[:, :-1].values
     y = df.iloc[:, -1].values
 
-    if percentile != None or percentile != 0:
-        # X = SelectKBest(mutual_info_classif, k=percentile).fit_transform(X, y)
+    if percentile is not None and percentile != 0:
         X = SelectPercentile(mutual_info_classif, percentile=percentile).fit_transform(X, y)
 
     X_train = X[0:n_samples_train,:]
@@ -141,9 +139,30 @@ def process_adult(percentile=None):
 
     return X_train, X_test, y_train, y_test
 
+def process_credit(percentile=None, n_neg_samples=20000):
+    df = pd.read_csv('data/creditcard.csv')
+    df.drop(columns=['Time'], axis=0, inplace=True)
+    n_neg_samples = int(n_neg_samples)
+
+    if n_neg_samples is not None:
+        df_pos = df[df.Class == 1].reset_index()
+        df.drop(df[df.Class == 1].index, inplace=True)
+        df = df.sample(frac=1, random_state=0).reset_index(drop=True)
+        df = pd.concat([df.head(n_neg_samples), df_pos], axis=0)
+        df = df.sample(frac=1, random_state=0).reset_index(drop=True)
+        df.drop(columns=['index'], axis=0, inplace=True)
+
+    X = df.iloc[:, :-1].values
+    y = df.iloc[:, -1].values
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+    return X_train, X_test, y_train, y_test
+
+
 if __name__ == '__main__':
     print("Running preprocessing . . .")
-    X_train, X_test, y_train, y_test = process_telco()
-    print()
-    X_train, X_test, y_train, y_test = process_adult()
+    # X_train, X_test, y_train, y_test = process_telco()
+    # X_train, X_test, y_train, y_test = process_adult()
+    X_train, X_test, y_train, y_test = process_credit()
     print("Finished preprocessing.")
