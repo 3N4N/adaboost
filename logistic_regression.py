@@ -61,10 +61,7 @@ def report(y, y_pred):
     print("F1-Score :", f1s)
 
 
-def run_logistic_regression():
-    # X_train, X_test, y_train, y_test = preproc.process_telco(0)
-    X_train, X_test, y_train, y_test = preproc.process_adult(0)
-    # X_train, X_test, y_train, y_test = preproc.process_credit(0)
+def run_logistic_regression(X_train, X_test, y_train, y_test):
     lr = LogisticRegression(X_train, y_train)
     lr.sgd()
     print(lr.w)
@@ -79,4 +76,7 @@ def run_logistic_regression():
 
 
 if __name__ == '__main__':
-    run_logistic_regression()
+    # X_train, X_test, y_train, y_test = preproc.process_telco(30)
+    # X_train, X_test, y_train, y_test = preproc.process_adult(30)
+    X_train, X_test, y_train, y_test = preproc.process_credit(30)
+    run_logistic_regression(X_train, X_test, y_train, y_test)

@@ -59,11 +59,8 @@ class Adaboost():
 
         return yhat
 
-def run_adaboost():
-    # X_train, X_test, y_train, y_test = preproc.process_telco(0)
-    X_train, X_test, y_train, y_test = preproc.process_adult(None)
-    # X_train, X_test, y_train, y_test = preproc.process_credit(0)
-    adb = Adaboost(X_train, y_train, 5)
+def run_adaboost(X_train, X_test, y_train, y_test, nitr):
+    adb = Adaboost(X_train, y_train, nitr)
     adb.fit()
 
     n_samples, n_features = np.shape(X_train)
@@ -86,4 +83,7 @@ def run_adaboost():
 
 
 if __name__ == '__main__':
-    run_adaboost()
+    # X_train, X_test, y_train, y_test = preproc.process_telco(30)
+    # X_train, X_test, y_train, y_test = preproc.process_adult(30)
+    X_train, X_test, y_train, y_test = preproc.process_credit(0)
+    run_adaboost(X_train, X_test, y_train, y_test, 15)
