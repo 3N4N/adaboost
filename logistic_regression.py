@@ -46,17 +46,19 @@ class LogisticRegression():
 
 def report(y, y_pred):
     [[TN, FP], [FN, TP]] = cm(y, y_pred)
+    accuracy = (TP + TN) / (TP + TN + FP + FN)
     tpr = TP / (TP + FN)
     tnr = TN / (TN + FP)
     ppv = TP / (TP + FP)
     fdr = FP / (FP + TP)
     f1s = 2*TP / (2*TP + FP + FN)
     print(TP, TN, FP, FN)
-    print("TPR:", tpr)
-    print("TNR:", tnr)
-    print("PPV:", ppv)
-    print("FDR:", fdr)
-    print("F1-Score:", f1s)
+    print("Accuracy :", accuracy)
+    print("TPR      :", tpr)
+    print("TNR      :", tnr)
+    print("PPV      :", ppv)
+    print("FDR      :", fdr)
+    print("F1-Score :", f1s)
 
 
 def run_logistic_regression():
