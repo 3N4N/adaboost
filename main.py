@@ -1,8 +1,8 @@
 import numpy as np
 
 import preproc
-from logistic_regression import LogisticRegression
-from adaboost import Adaboost
+from model.logistic_regression import LogisticRegression
+from model.adaboost import Adaboost
 
 def run_logistic_regression(X_train, X_test, y_train, y_test):
     lr = LogisticRegression(X_train, y_train)
@@ -40,8 +40,8 @@ def run_adaboost(X_train, X_test, y_train, y_test, nitr):
 
 
 if __name__ == '__main__':
-    # X_train, X_test, y_train, y_test = preproc.process_telco(30)
+    X_train, X_test, y_train, y_test = preproc.process_telco(30)
     # X_train, X_test, y_train, y_test = preproc.process_adult(30)
-    X_train, X_test, y_train, y_test = preproc.process_credit(30)
+    # X_train, X_test, y_train, y_test = preproc.process_credit(30)
     run_logistic_regression(X_train, X_test, y_train, y_test)
     run_adaboost(X_train, X_test, y_train, y_test, 10)

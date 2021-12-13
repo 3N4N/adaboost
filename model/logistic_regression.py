@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
-import math as m
-from sklearn.metrics import confusion_matrix as cm
 
-import preproc
+from sklearn.metrics import confusion_matrix as cm
 
 
 class LogisticRegression():
@@ -14,9 +12,6 @@ class LogisticRegression():
         self.X = X
         self.y = y
         self.w = []
-
-    def tanh(self, x):
-        return float((m.exp(x) - m.exp(-x)) / (m.exp(x) + m.exp(-x)))
 
     def predict(self, examples, w=None):
         if w is None:

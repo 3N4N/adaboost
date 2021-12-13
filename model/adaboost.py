@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
-import math as m
 
-import preproc
-from logistic_regression import LogisticRegression
+from model.logistic_regression import LogisticRegression
 
 
 class Adaboost():
